@@ -20,3 +20,97 @@ NGINX Fundamentals: High Performance Servers from Scratch - by Ray Vilijoen on U
 specific directory configurations. NGINX doesn't offer any similar functionality, but seeing as Apache's .htaccess overrides carries significant performance penalty, they shouldn't really be considered an advantage. It's also because of this very design of interpreting requests as URI locations that allows NGINX to easily function as not only a Web server but anything from a load balancer to a mail server. 
 
 [Google trends - NGINX](https://trends.google.com/trends/explore?date=all&q=nginx)
+
+
+## Installation
+
+```shell
+ssh root@<IP>
+```
+Digital Ocean - IaaS 
+
+SSH Clients: Remotely edit the files or manage folders:
+- [Transmit](https://panic.com/transmit/)
+- [Cyberduck](https://cyberduck.io/)
+- [FileZilla](https://filezilla-project.org/)
+
+
+```shell
+$ sudo apt-get update 
+$ sudo apt-get install nginx 
+$ ps aux | grep nginx
+$ ifconfig
+```
+
+
+### Building NGINX from Source and Adding modules
+
+NGINX has two websites:
+- Product side: https://www.nginx.com/ <br>
+- Documentation: http://nginx.org/
+
+[NGINX Downloads](http://nginx.org/en/download.html)
+
+```shell
+$ wget http://nginx.org/download/nginx-1.21.3.tar.gz (Mainline version)
+$ tar -zxvF nginx-1.21.3.tar.gz
+$ cd nginx-1.21.3
+$ ./configure (configure source code for build. here it will give error as compiler not found)
+$ sudo apt-get install build-essential (install compiler or dev tools)
+$ ./configure
+$ sudo apt-get install libpcre3 libpcre3-dev zlib1g zlib1g-dev libssl-dev (install missing packages)
+$ ./configure
+```
+
+### Customize the installation
+
+[NGINX Configuration Options](http://nginx.org/en/docs/configure.html)
+
+Example of parameters usage (all of this needs to be typed in one line): 
+```shell
+$ ./configure 
+    --sbin-path=/usr/bin/nginx 
+    --conf-path=/etc/nginx/nginx.conf 
+    --error-log-path=/var/log/nginx/error.log 
+    --http-log-path=/var/log/nginx/access.log 
+    --with-pcre
+    --pid-path=/var/run/nginx.pid 
+    --with http_ssl_module
+$ make
+$ make install
+```
+
+### Adding an NGINX Service
+
+We are going to add NGINX as `systemd` service - the newer and more popular standard for services. systemd is only available on Ubuntu > 15.04 versions. Creating an NGINX service will not only allow start, stop, restart and reload NGINX in a more standarized way but also make NGINX start on boot much simpler.
+
+[systemd System and Service Manager](https://www.freedesktop.org/wiki/Software/systemd/) <br>
+[NGINX Example Init Scripts](https://www.nginx.com/resources/wiki/start/topics/examples/initscripts/) <br>
+[NGINX systemd service file](https://www.nginx.com/resources/wiki/start/topics/examples/systemd/) <br>
+
+```shell
+[Unit]
+Description=The NGINX HTTP and reverse proxy server
+After=syslog.target network-online.target remote-fs.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/nginx.pid 
+ExecStartPre=/usr/bin/nginx -t
+ExecStart=/usr/bin/nginx
+ExecReload=/usr/sbin/nginx -s reload
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```shell
+$ systemctl start nginx
+$ systemctl stop nginx
+$ systemctl restart nginx
+$ systemctl enable nginx
+```
+
