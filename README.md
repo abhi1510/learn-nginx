@@ -114,3 +114,28 @@ $ systemctl restart nginx
 $ systemctl enable nginx
 ```
 
+
+## Configuration
+
+**Directives:** Specific configuration options that get set in the configuration files and consists of a name and a value. eg. server_name mydomain.com <br>
+**Context:** Sections within the configuration where directive can be set for that given context. It can be thought as the scope - these are also nested and inherit from their parent scope.
+
+### Creating a virtual host
+
+```shell
+events {}
+
+http {
+    
+    include mime.types;
+
+    server {
+        listen 80;
+        server_name <IP>;
+        
+        root /sites/demo;
+    }
+}
+```
+
+
