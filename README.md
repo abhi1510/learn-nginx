@@ -208,3 +208,48 @@ http {
 }
 ```
 
+### Variables
+
+NGINX has two types of vaiables:
+- Configuration Variables as set $var 'something';
+- NGINX Module Variables as $http, $uri, $args
+
+```shell
+events {}
+http {
+
+    include mime.types;
+
+    server {
+        listen 80;
+        server_name <IP>;
+        
+        root /sites/demo; # path from where the nginx will be serving (static) requests.
+        
+        # Check static API key
+        if ($arg_apikey != 1234) {
+            return 401 "Incorrect API Key"
+        }
+       
+        location /inspect {
+            return 200 "$host\n$uri\n$args";
+        #    return 200 "Name: $arg_name";
+        }
+        
+        set $weekend "NO";
+        
+        # Check if weekend
+        if ($date_local ~ 'Saturday|Sunday') {
+            set $weekend "YES";
+        }
+        
+        location /is-weekend {
+            return 200 $weekend;
+        }
+    }
+}
+```
+
+(NGINX Docs - Variables](http://nginx.org/en/docs/varindex.html)
+[Article - If is Evil](https://www.nginx.com/resources/wiki/start/topics/depth/ifisevil/)
+
