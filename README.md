@@ -122,20 +122,53 @@ $ systemctl enable nginx
 
 ### Creating a virtual host
 
+We want to get rid of default NGINX page. For that we need to define a virtual host. Each virtual host is a new server context/block. A virtual host or a server context is essentially reponsible for listening on a particular port, typically port 80 for http and 443 for https for a given IP address or a domain.
+
 ```shell
 events {}
-
 http {
-    
+    server {
+        listen 80;
+        server_name <IP>;
+        
+        root /sites/demo; # path from where the nginx will be serving (static) requests.
+    }
+}
+```
+
+```shell
+nginx -t
+systemctl reload nginx 
+```
+
+NOTE: NGINX by default will not sent the MIME types based on file extensions. For this we need to specify `type` context as 
+```shell
+types {
+    text/html html;
+    text/css css;
+}
+```
+There is an easy way though. Using include as:
+```shell
+include mime.types;
+```
+
+Complete code:
+``shell
+events {}
+http {
+
     include mime.types;
 
     server {
         listen 80;
         server_name <IP>;
         
-        root /sites/demo;
+        root /sites/demo; # path from where the nginx will be serving (static) requests.
     }
 }
 ```
+
+
 
 
