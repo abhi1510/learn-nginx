@@ -154,7 +154,7 @@ include mime.types;
 ```
 
 Complete code:
-``shell
+```shell
 events {}
 http {
 
@@ -169,6 +169,42 @@ http {
 }
 ```
 
+### Location blocks
 
+This is how we define and configure the behavior of specific URI's or requests to NGINX. It can be thought of as intercepting requests based on the value and doing something other than serving the matching file relative to the root directory. Let's create a custom location request and intercept the greet request. 
 
+```shell
+events {}
+http {
+
+    include mime.types;
+
+    server {
+        listen 80;
+        server_name <IP>;
+        
+        root /sites/demo; # path from where the nginx will be serving (static) requests.
+        
+        # # Prefix match meaning anything after /greet like /greeting or /greet/more also matches
+        # location /greet { 
+        #     return 200 'Hello from NGINX.'
+        # }
+        
+        # # Exact match
+        # location = /greet {
+        #     return 200 'Hello from NGINX - Exact Match'
+        # }
+        
+        # # Regex match - case sensitive
+        # location ~/greet[0-9] {
+        #     return 200 'Hello from NGINX - Regex Match'
+        # }
+        
+        # Regex match - case insensitive
+        location ~* /greet[0-9] {
+            return 200 'Hello from NGINX - Regex Match'
+        }
+    }
+}
+```
 
