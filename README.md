@@ -250,6 +250,31 @@ http {
 }
 ```
 
-(NGINX Docs - Variables](http://nginx.org/en/docs/varindex.html)
+[NGINX Docs - Variables](http://nginx.org/en/docs/varindex.html) <br>
 [Article - If is Evil](https://www.nginx.com/resources/wiki/start/topics/depth/ifisevil/)
+
+### Rewrites & Redirects
+
+A redirect simply tells the client performing the request where to go instead. A rewrite on the other hand mutates the URI internally. 
+
+```shell
+events {}
+http {
+
+    include mime.types;
+
+    server {
+        listen 80;
+        server_name <IP>;
+        
+        root /sites/demo; # path from where the nginx will be serving (static) requests.
+        
+        rewrite ^/user/\w+ /greet;
+        
+        location /greet {
+            return 301 $weekend;
+        }
+    }
+}
+```
 
